@@ -1,8 +1,0 @@
-import streamlit as st
-
-st.title("Enterprise RAG Chatbot")
-
-question = st.text_input("Ask a question")
-
-if question:
-    st.write("🔍 Searching knowledge base...")
