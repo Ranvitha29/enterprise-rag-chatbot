@@ -1,0 +1,6 @@
+Enterprise RAG Project
+
+This project uses Sentence Transformers for embeddings.
+ChromaDB is used as a vector database.
+Ollama runs Llama 3 locally.
+The system retrieves relevant context before generating answers.

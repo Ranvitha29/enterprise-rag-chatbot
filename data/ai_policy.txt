@@ -1,0 +1,5 @@
+Enterprise AI Policy
+
+Artificial Intelligence should be used responsibly.
+All AI-generated outputs must be reviewed by humans.
+Employees must follow data privacy guidelines.
