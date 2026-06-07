@@ -2,7 +2,10 @@ print("RAG FILE WORKING")
 
 from sentence_transformers import SentenceTransformer
 import chromadb
-import ollama
+from groq import Groq
+client = Groq(
+    api_key=os.getenv("GROQ_API_KEY")
+)
 import os
 
 # =====================
@@ -84,15 +87,14 @@ Question:
 {query}
 """
 
-    response = ollama.chat(
-        model="llama3:latest",
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
-    )
+   response = client.chat.completions.create(
+    model="llama3-8b-8192",
+    messages=[
+        {"role": "user", "content": prompt}
+    ]
+)
 
-    return response["message"]["content"]
-
+return response.choices[0].message.content
 # =====================
 # TERMINAL CHAT
 # =====================
