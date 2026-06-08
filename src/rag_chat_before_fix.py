@@ -94,46 +94,18 @@ Question:
     )
 
     return response["message"]["content"]
-    chat_history = []
-if __name__ == "__main__":
-    while True:
+    if **name** == "**main**":
+
+```
+while True:
+
     query = input("\nAsk your question (or type exit): ")
 
     if query.lower() == "exit":
         break
 
-    query_embedding = embedding_model.encode([query])
-
-    results = collection.query(
-        query_embeddings=query_embedding,
-        n_results=5
-    )
-    print("\n📄 Retrieved Context:\n", results["documents"][0])
-
-    context = "\n".join(results["documents"][0])
-
-    prompt = f"""
-You are a RAG assistant.
-
-Rules:
-1. Use ONLY the context provided.
-2. Do NOT guess.
-3. Do NOT add extra information.
-4. Answer in 1-2 sentences.
-
-Context:
-{context}
-
-Question:
-{query}
-"""
-
-    response = ollama.chat(
-        model="llama3:latest",
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
-    )
+    answer = ask_rag(query)
 
     print("\n🤖 ANSWER:\n")
-    print(response["message"]["content"])
+    print(answer)
+```

@@ -1,6 +1,5 @@
 import streamlit as st
 from rag_chat import ask_rag
-
 st.title("Enterprise RAG Chatbot")
 
 question = st.text_input("Ask a question")
