@@ -2,12 +2,8 @@ print("RAG FILE WORKING")
 
 from sentence_transformers import SentenceTransformer
 import chromadb
-from groq import Groq
+import ollama
 import os
-
-client = Groq(
-    api_key=os.getenv("GROQ_API_KEY")
-)
 
 # =====================
 # EMBEDDING MODEL
@@ -55,53 +51,36 @@ if len(existing["ids"]) == 0:
 # =====================
 # RAG FUNCTION
 # =====================
-# =====================
-
-# RAG FUNCTION
-
-# =====================
-
 def ask_rag(query):
-
     query_embedding = embedding_model.encode([query])
-
     results = collection.query(
         query_embeddings=query_embedding,
         n_results=5
     )
-
     context = "\n".join(results["documents"][0])
 
     prompt = f"""
+You are a RAG assistant.
 
+Rules:
+1. Use ONLY the context provided.
+2. Do NOT guess.
+3. Do NOT add extra information.
+4. Answer in 1-2 sentences.
 
-    You are a RAG assistant.
+Context:
+{context}
 
-    Rules:
+Question:
+{query}
+"""
 
-    1. Use ONLY the context provided.
-    2. Do NOT guess.
-    3. Do NOT add extra information.
-    4. Answer in 1-2 sentences.
-
-    Context:
-    {context}
-
-    Question:
-    {query}
-    """
-
-
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
+    response = ollama.chat(
+        model="llama3:latest",
+        messages=[{"role": "user", "content": prompt}]
     )
 
-    return response.choices[0].message.content
-
-
+    return response["message"]["content"]
 
 # =====================
 # TERMINAL CHAT
