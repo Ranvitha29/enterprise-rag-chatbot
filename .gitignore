@@ -3,3 +3,4 @@ __pycache__/
 chroma_db/
 *.pyc
 src/test_models.py
+.env
