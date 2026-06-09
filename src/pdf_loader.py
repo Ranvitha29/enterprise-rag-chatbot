@@ -1,36 +1,35 @@
-import chromadb
+from pypdf import PdfReader
 from sentence_transformers import SentenceTransformer
+import chromadb
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
-text = open("data/sample.txt", "r", encoding="utf-8").read()
-chunks = [text[i:i+50] for i in range(0, len(text), 50)]
-embeddings = model.encode(chunks)
+chroma_client = chromadb.PersistentClient(path="./chroma_db")
+collection = chroma_client.get_or_create_collection("rag_store")
 
-client = chromadb.Client()
-collection = client.get_or_create_collection(name="rag_store")
 
-# store data
-for i, chunk in enumerate(chunks):
-    collection.add(
-        ids=[str(i)],
-        documents=[chunk],
-        embeddings=[embeddings[i].tolist()]
-    )
+def process_pdf(pdf_path):
 
-print("DATA STORED ✅")
+    reader = PdfReader(pdf_path)
 
-# -------- QUERY PART --------
+    text = ""
 
-query = "What is this project about?"
+    for page in reader.pages:
+        page_text = page.extract_text()
 
-query_embedding = model.encode([query])
+        if page_text:
+            text += page_text + "\n"
 
-results = collection.query(
-    query_embeddings=query_embedding,
-    n_results=2
-)
+    chunks = [text[i:i+500] for i in range(0, len(text), 500)]
 
-print("\nTOP MATCHES:")
-for doc in results["documents"][0]:
-    print("-", doc)
+    for i, chunk in enumerate(chunks):
+
+        embedding = model.encode(chunk)
+
+        collection.add(
+            ids=[f"pdf_{i}"],
+            documents=[chunk],
+            embeddings=[embedding.tolist()]
+        )
+
+    print("PDF STORED IN CHROMADB ✅")
