@@ -2,13 +2,12 @@ print("RAG FILE WORKING")
 
 from sentence_transformers import SentenceTransformer
 import chromadb
-from groq import Groq
 import os
+from groq import Groq
 
 client = Groq(
     api_key=os.getenv("GROQ_API_KEY")
 )
-
 # =====================
 # EMBEDDING MODEL
 # =====================
