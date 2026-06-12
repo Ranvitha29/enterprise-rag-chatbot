@@ -1,13 +1,3 @@
-from pypdf import PdfReader
-from sentence_transformers import SentenceTransformer
-import chromadb
-
-model = SentenceTransformer("all-MiniLM-L6-v2")
-
-chroma_client = chromadb.PersistentClient(path="./chroma_db")
-collection = chroma_client.get_or_create_collection("rag_store")
-
-
 def process_pdf(pdf_path):
 
     reader = PdfReader(pdf_path)
@@ -22,8 +12,17 @@ def process_pdf(pdf_path):
 
     chunks = [text[i:i+500] for i in range(0, len(text), 500)]
 
-    for i, chunk in enumerate(chunks):
+    # Reset the collection by deleting and recreating it
+    global collection, chroma_client
 
+    try:
+        chroma_client.delete_collection("rag_store")
+    except:
+        pass
+
+    collection = chroma_client.get_or_create_collection("rag_store")
+
+    for i, chunk in enumerate(chunks):
         embedding = model.encode(chunk)
 
         collection.add(
