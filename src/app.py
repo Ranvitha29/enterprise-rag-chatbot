@@ -1,36 +1,33 @@
-import streamlit as st
-import tempfile
+def process_pdf(pdf_path):
 
-from rag_chat import ask_rag
-from pdf_loader import process_pdf
+    # Clear old PDF data from ChromaDB
+    try:
+        existing = collection.get()
+        if existing["ids"]:
+            collection.delete(ids=existing["ids"])
+    except Exception:
+        pass
 
-st.title("Enterprise RAG Chatbot")
+    reader = PdfReader(pdf_path)
 
-uploaded_file = st.file_uploader(
-    "Upload a PDF",
-    type=["pdf"]
-)
+    text = ""
 
-if uploaded_file:
+    for page in reader.pages:
+        page_text = page.extract_text()
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+        if page_text:
+            text += page_text + "\n"
 
-        tmp_file.write(uploaded_file.read())
+    chunks = [text[i:i+500] for i in range(0, len(text), 500)]
 
-        pdf_path = tmp_file.name
+    for i, chunk in enumerate(chunks):
 
-    process_pdf(pdf_path)
+        embedding = model.encode(chunk)
 
-    st.success("PDF uploaded successfully!")
+        collection.add(
+            ids=[f"pdf_{i}"],
+            documents=[chunk],
+            embeddings=[embedding.tolist()]
+        )
 
-question = st.text_input("Ask a question")
-
-if question:
-
-    with st.spinner("Searching knowledge base..."):
-
-        answer = ask_rag(question)
-
-    st.subheader("Answer")
-
-    st.write(answer)
+    print("PDF STORED IN CHROMADB ✅")
